@@ -1,0 +1,35 @@
+import { Body, Controller, Inject, OnModuleInit, Post } from '@nestjs/common';
+import { ClientKafka, EventPattern, Payload } from '@nestjs/microservices';
+import { PhishingCreateDto } from '@libs/phishing';
+import { LogService } from '@libs/log';
+import { AppService } from './app.service';
+
+@Controller()
+export class AppController implements OnModuleInit {
+  constructor(
+    @Inject('EVENT_SERVICE') private readonly client: ClientKafka,
+    private readonly appService: AppService,
+    private readonly logService: LogService,
+  ) {}
+ 
+  @Post('/phishing/send')
+  phishing(@Body() data: PhishingCreateDto) {
+    const {emails} = data;
+    this.logService.debug('adding phishing')
+    this.appService.saveBatch(emails);
+  }
+
+  @EventPattern('request.phishing.save')
+  async sendEmail(@Payload() data: {email: string}) {
+    this.logService.debug('adding phishing');
+    const phishing = await this.appService.add(data.email);
+    this.appService.sendEmail({
+      email: phishing.email,
+      trackId: phishing.trackId,
+    });
+  }
+
+  onModuleInit() {
+    this.client.subscribeToResponseOf('request.phishing.save');
+  }
+}
