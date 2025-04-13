@@ -1,15 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DatabaseService } from '@libs/database';
 import { SearchQueryDto } from './phishing';
 import { Phishing } from './phishing.schema';
+import { Db } from 'mongodb';
 
 @Injectable()
 export class PhishingService {
-    constructor(@Inject() private databaseService: DatabaseService) {}
+    constructor(@Inject('DATABASE_CONNECTION') private db: Db) {}
 
   async create(createDto: Phishing): Promise<Phishing> {
-    const db = this.databaseService.getDb();
-    const entity = await db.collection('Phishing').insertOne(createDto);
+    const entity = await this.db.collection('Phishing').insertOne(createDto);
 
     return {
       ...createDto,
@@ -18,8 +17,7 @@ export class PhishingService {
   }
 
   async findAll(filter: Partial<Document>, pagination: SearchQueryDto): Promise<Document[]> {
-    const db = this.databaseService.getDb();
-    return db.collection<Document>('Phishing')
+    return this.db.collection<Document>('Phishing')
       .find(filter)
       .limit(pagination.limit || -1)
       .skip(pagination.skip || 0)

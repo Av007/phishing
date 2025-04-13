@@ -1,5 +1,5 @@
-import { Type } from "class-transformer";
-import { IsArray, IsEmail, IsInt, IsOptional, Min } from "class-validator";
+import { Type } from 'class-transformer';
+import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class SearchQueryDto {
   @IsOptional()
@@ -16,7 +16,6 @@ export class SearchQueryDto {
 }
 
 export class PhishingCreateDto {
-  @IsArray()
-  @IsEmail({}, { each: true }) // validates each email in the array
-  emails!: string[];
+  @IsString()
+  emails!: string;
 }

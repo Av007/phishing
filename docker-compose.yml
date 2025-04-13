@@ -1,4 +1,21 @@
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      target: production
+    container_name: frontend
+    ports:
+      - "3001:3000"
+    depends_on:
+      - management
+      - simulation
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3001
+    networks:
+      - app-network
+
   management:
     build:
       context: .
@@ -15,7 +32,8 @@ services:
       - PORT=3000
       - MONGO_URI=mongodb://mongo:27017/test
       - DATABASE_URL=mongodb://mongo:27017
-      - DATABASE_NAME=test 
+      - DATABASE_NAME=test
+      - KAFKA_BROKER=kafka:9092
     networks:
       - app-network
 
@@ -36,6 +54,7 @@ services:
       - MONGO_URI=mongodb://mongo:27017/test
       - DATABASE_URL=mongodb://mongo:27017
       - DATABASE_NAME=test
+      - KAFKA_BROKER=kafka:9092
     networks:
       - app-network
 

@@ -1,23 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { Inject, Injectable } from '@nestjs/common';
 import { Db, ObjectId } from 'mongodb';
 import { LogService } from '@libs/log';
-import { DatabaseService } from '@libs/database';
 import { CreateUserDto, UpdateUserDto } from './types';
 
 @Injectable()
 export class UserService {
   private collectionName = 'users';
-  private db: Db;
 
   constructor(
-    private readonly databaseService: DatabaseService,
+    @Inject('DATABASE_CONNECTION') private db: Db,
     private readonly logService: LogService
-  ) {
-    this.db = this.databaseService.getDb();
-  }
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const result = await this.db.collection(this.collectionName).insertOne(createUserDto);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+    const result = await this.db.collection(this.collectionName).insertOne({
+      ...createUserDto,
+      password: hashedPassword,
+      createdAt: new Date(),
+    });
     this.logService.log(`User created: ${result.insertedId}`);
     return { _id: result.insertedId, ...createUserDto };
   }

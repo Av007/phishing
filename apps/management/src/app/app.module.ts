@@ -3,8 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LogModule } from '@libs/log';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatabaseModule } from '@libs/database';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -13,23 +14,28 @@ import { DatabaseModule } from '@libs/database';
       envFilePath: '.env',
     }),
     DatabaseModule,
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'EVENT_SERVICE',
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            clientId: 'local',
-            brokers: ['kafka:9093'],
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.KAFKA,
+          options: {
+            client: {
+              clientId: configService.get<string>('KAFKA_CLIENT_ID'),
+              brokers: [configService.get<string>('KAFKA_BROKER')],
+              requestTimeout: 30000,
+            },
+            consumer: {
+              groupId: configService.get<string>('KAFKA_SIMULATOR_GROUP_ID'),
+            },
           },
-          consumer: {
-            groupId: 'test-id',
-          },
-        },
+        }),
       },
     ]),
-    DatabaseModule,
-    LogModule
+    LogModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

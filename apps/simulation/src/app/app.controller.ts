@@ -11,16 +11,23 @@ export class AppController implements OnModuleInit {
     private readonly appService: AppService,
     private readonly logService: LogService,
   ) {}
- 
+
   @Post('/phishing/send')
-  phishing(@Body() data: PhishingCreateDto) {
-    const {emails} = data;
-    this.logService.debug('adding phishing')
-    this.appService.saveBatch(emails);
+  phishingSend(@Body() data: PhishingCreateDto) {
+    const { emails } = data;
+
+    const emailsFiltered = emails
+      .split(',')
+      .map((email) => email.trim())
+      .filter((email) => email.length > 0);
+    this.logService.debug('adding phishing');
+
+    this.appService.saveBatch(emailsFiltered);
+    return 'ok';
   }
 
   @EventPattern('request.phishing.save')
-  async sendEmail(@Payload() data: {email: string}) {
+  async sendEmail(@Payload() data: { email: string }) {
     this.logService.debug('adding phishing');
     const phishing = await this.appService.add(data.email);
     this.appService.sendEmail({

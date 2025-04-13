@@ -11,19 +11,13 @@ export class User {
   email!: string;
 
   @IsString()
-  @MinLength(3)
-  @MaxLength(50)
-  username!: string;
-
-  @IsString()
   @MinLength(8)
   @MaxLength(100)
   password!: string;
 
-  @IsOptional()
   @IsDate()
   @Type(() => Date)
-  createdAt?: Date;
+  createdAt!: Date;
 
   @IsOptional()
   @IsDate()

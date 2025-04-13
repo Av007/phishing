@@ -1,5 +1,12 @@
 import { UUID } from 'crypto';
-import { IsEmail, IsString, MinLength, MaxLength, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  MaxLength,
+  Matches,
+} from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
 
 export type AccessToken = {
   access_token: string;
@@ -16,19 +23,24 @@ export type AccessTokenPayload = {
 
 export class RegisterRequestDto {
   @IsEmail()
-  email: string;
-
-  @IsString()
-  @MinLength(3)
+  @MinLength(6)
   @MaxLength(50)
-  username: string;
+  email: string;
 
   @IsString()
   @MinLength(8)
   @MaxLength(100)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/, {
-    message:
-      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-  })
   password: string;
 }
+
+export class CreateUserDto {
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @MinLength(6)
+  password: string;
+}
+
+export class UpdateUserDto extends PartialType(CreateUserDto) {}
+

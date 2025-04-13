@@ -17,7 +17,7 @@
     "paths": {
       "@libs/database": ["libs/database/src/index.ts"],
       "@libs/log": ["libs/log/src/index.ts"],
-      "@libs/phishing": ["libs/phishing/src/index.ts"],
+      "@libs/phishing": ["libs/phishing/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
