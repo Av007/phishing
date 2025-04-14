@@ -23,8 +23,17 @@ export class AppService {
     });
   }
 
+  async get(trackId: string) {
+    return this.phishingService.findByTrackId(trackId);
+  }
+
+  async update(phishing: Phishing) {
+    return this.phishingService.update(phishing);
+  }
+  
+
   async sendEmail(message: Pick<Phishing, 'email' | 'trackId'>) {
-    this.emailService.sendMail(message.email, message.trackId);
+    return this.emailService.sendMail(message.email, message.trackId);
   }
 
   saveBatch(emails: string[]) {

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LogModule } from '@libs/log';
 import { DatabaseModule } from '@libs/database';
-import { PhishingService } from '@libs/phishing';
+import { PhishingModule, PhishingService } from '@libs/phishing';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MailerService } from './email.service';
@@ -21,7 +21,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             client: {
               clientId: configService.get<string>('KAFKA_CLIENT_ID'),
               brokers: [configService.get<string>('KAFKA_BROKER')],
-              requestTimeout: 30000
             },
             consumer: {
               groupId: configService.get<string>('KAFKA_SIMULATOR_GROUP_ID'),
@@ -32,6 +31,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ]),
     DatabaseModule,
     LogModule,
+    PhishingModule
   ],
   controllers: [AppController],
   providers: [AppService, MailerService, PhishingService],

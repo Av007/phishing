@@ -44,15 +44,15 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const intervalId = setInterval(async () => {
       try {
         const {data} = await api.get('/api/auth/me');
-        console.log(data, 'user');
         localStorage.set('email', data.user?.email);
         
       } catch (error: any) {
         if (error.response?.status === 401) {
           setToken(null);
+          localStorage.removeItem('token');
         }
       }
-    }, 5 * 60 * 1000);
+    }, 10000); // 5 min
 
     return () => clearInterval(intervalId);
   }, [token]);

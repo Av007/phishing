@@ -26,6 +26,7 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
+  await app.startAllMicroservices();
   await app.listen(4000);
   Logger.log(
     `🚀 Application is running on: localhost:4000`

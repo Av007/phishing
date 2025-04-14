@@ -6,13 +6,13 @@ export class SearchQueryDto {
   @IsInt()
   @Min(0)
   @Type(() => Number)
-  skip?: number;
+  skip?: number = 0;
 
   @IsOptional()
   @IsInt()
-  @Min(1)
+  @Min(-1)
   @Type(() => Number)
-  limit?: number;
+  limit?: number = 0;
 }
 
 export class PhishingCreateDto {

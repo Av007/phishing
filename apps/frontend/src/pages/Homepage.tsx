@@ -1,11 +1,11 @@
-import { useState, useCallback } from 'react';
-import axios from 'axios';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { formatDistance } from 'date-fns';
 import _ from 'lodash';
 import AddIcon from '@mui/icons-material/Add';
+import SendIcon from '@mui/icons-material/Send';
 import {
   DataGrid,
   GridRowModel,
-  GridRowModes,
   GridRowModesModel,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
@@ -25,35 +25,65 @@ import {
 } from '@mui/material';
 import { useAuth } from '../provider/AuthProvider';
 import { api, apiSimulation } from '../helpers/api';
+import StatusChip, { PhishingStatus } from '../components/status';
+import { TrackActions } from '../components/TrackActions';
+import { getEnvsUrl } from '../helpers/envs';
 
 const Homepage = () => {
   const { token } = useAuth();
   const [username] = useState(localStorage.getItem('email'));
   const [data, setData] = useState<GridRowModel[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
-  const columns = [
-    { field: 'id', headerName: 'ID' },
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'description', headerName: 'Description', width: 300 },
-    { field: 'price', headerName: 'Price' },
-    { field: 'stock', headerName: 'Stock' },
-  ];
+  const simulationUrl = getEnvsUrl('VITE_SIMULATION_URL');
+
+  const columns = useMemo(
+    () => [
+      { field: '_id', headerName: 'ID' },
+      { field: 'email', headerName: 'email', width: 200 },
+      {
+        field: 'status',
+        headerName: 'Status',
+        renderCell: (params: { value: PhishingStatus }) => (
+          <StatusChip status={params.value} />
+        ),
+      },
+      {
+        field: 'trackId',
+        headerName: 'Link',
+        sortable: false,
+        filterable: false,
+        renderCell: (params: { value: string }) => (
+          <TrackActions trackId={params.value} endpointUrl={simulationUrl} />
+        ),
+      },
+      {
+        field: 'createdAt',
+        headerName: 'Created',
+        width: 200,
+        renderCell: (param: { value: string }) =>
+          formatDistance(param.value, Date.now(), {
+            addSuffix: true,
+          }),
+      },
+    ],
+    [simulationUrl],
+  );
 
   const fetchResults = useCallback(
     _.debounce(() => {
       api
-        .get('api/products', {
-          params: {},
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        })
+        .get('api/phishing', { params: {} })
         .then((response) => {
-          const items = response?.data || [];
-          setData(items);
+          const { data } = response;
+          setData(
+            data.map((item: any) => ({
+              ...item,
+              id: item._id,
+            })),
+          );
         })
         .catch((error) => {
           console.error('API Error:', error);
@@ -62,21 +92,19 @@ const Homepage = () => {
     [token],
   );
 
+  useEffect(() => {
+    fetchResults();
+    const interval = setInterval(() => {
+      fetchResults();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [fetchResults]);
+  
+
   const rowSelected = async (newRowSelectionModel: any) => {
     for (const item of newRowSelectionModel) {
       if (!selected.includes(item)) {
         setSelected(newRowSelectionModel);
-
-        await apiSimulation.put(
-          'phishing/send',
-          { emails: '' },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          },
-        );
       }
     }
   };
@@ -92,28 +120,26 @@ const Homepage = () => {
     };
 
     const handleAddEmails = async () => {
-      const emails = emailInput
-        .split(',')
-        .map((email) => email.trim())
-        .filter((email) => email.length > 0);
+      await apiSimulation.post('phishing/send', { emails: emailInput });
 
-      const {data} = await apiSimulation.post('phishing/send', { emails });
-
-      // TODO: add request
-
-      setRowModesModel((oldModel) => {
-        const updatedModel = { ...oldModel };
-        newRows.forEach((row) => {
-          updatedModel[row.id] = {
-            mode: GridRowModes.Edit,
-            fieldToFocus: 'name',
-          };
-        });
-        return updatedModel;
-      });
-
+      fetchResults();
       handleClose();
     };
+
+    const handleBulkSend = () => {
+      if (selected.length === 0) {
+        return;
+      }
+      setOpenConfirm(true);
+    };
+
+    const confirmSend = async () => {
+      await api.post('api/bulk/send', {trackIds: selected});
+      fetchResults();
+      setOpenConfirm(false);
+    };
+
+    const cancelSend = () => setOpenConfirm(false);
 
     return (
       <>
@@ -126,7 +152,28 @@ const Homepage = () => {
           >
             Add emails
           </Button>
+
+          <Button
+            color="primary"
+            startIcon={<SendIcon />}
+            onClick={handleBulkSend}
+          >
+            Bulk send
+          </Button>
         </GridToolbarContainer>
+
+        <Dialog open={openConfirm} onClose={cancelSend}>
+          <DialogTitle>Confirm Bulk Send</DialogTitle>
+          <DialogContent>
+            Are you sure you want to send to {selected.length} recipient(s)?
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={cancelSend}>Cancel</Button>
+            <Button onClick={confirmSend} color="primary" variant="contained">
+              Send
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
           <DialogTitle>Add Emails</DialogTitle>

@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { LogModule } from '@libs/log';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatabaseModule } from '@libs/database';
+import { PhishingModule, PhishingService } from '@libs/phishing';
+import { LogModule } from '@libs/log';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
@@ -36,8 +37,9 @@ import { AuthModule } from '../auth/auth.module';
     ]),
     LogModule,
     AuthModule,
+    PhishingModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PhishingService],
 })
 export class AppModule {}
