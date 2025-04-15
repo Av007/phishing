@@ -23,8 +23,12 @@ export class AppService {
     });
   }
 
-  async get(trackId: string) {
+  async getByTrackId(trackId: string) {
     return this.phishingService.findByTrackId(trackId);
+  }
+
+  async get(trackId: string) {
+    return this.phishingService.find(trackId);
   }
 
   async update(phishing: Phishing) {

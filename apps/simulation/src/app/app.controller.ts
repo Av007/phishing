@@ -36,7 +36,7 @@ export class AppController implements OnModuleInit {
 
   @Get('/track/:id')
   async phishingClick(@Param('id') trackId: string): Promise<string> {
-    const phishing = await this.appService.get(trackId);
+    const phishing = await this.appService.getByTrackId(trackId);
     if (!phishing) {
       this.logService.warn(`broke the trackId: ${trackId}`);
       phishing.status = PhishingStatus.FAILED;
@@ -52,22 +52,23 @@ export class AppController implements OnModuleInit {
   }
 
   @EventPattern('request.phishing.save')
-  async sendEmail(@Payload() data: { email: string }) {
+  async save(@Payload() data: { email: string }) {
     this.logService.debug('adding phishing');
     await this.appService.add(data.email);
   }
 
   @EventPattern('request.phishing.sending')
-  async send(@Payload() data: { trackId: string }) {
-    const phishing: Phishing | null = await this.appService.get(data.trackId);
+  async send(@Payload() data: { id: string }) {
+    const phishing: Phishing | null = await this.appService.get(data.id);
     if (!phishing) {
       return;
     }
+    this.logService.log(`Sending email for ${phishing._id}`);
 
     try {
       await this.appService.sendEmail({
         email: phishing.email,
-        trackId: data.trackId,
+        trackId: phishing.trackId,
       });
       phishing.status = PhishingStatus.SENDING;
     } catch (e) {
@@ -80,5 +81,6 @@ export class AppController implements OnModuleInit {
 
   onModuleInit() {
     this.client.subscribeToResponseOf('request.phishing.save');
+    this.client.subscribeToResponseOf('request.phishing.sending');
   }
 }

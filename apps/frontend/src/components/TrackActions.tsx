@@ -5,11 +5,12 @@ import SendIcon from '@mui/icons-material/Send';
 import { api } from '../helpers/api';
 
 interface TrackActionsProps {
+  id: string;
   trackId: string;
   endpointUrl: string;
 }
 
-export const TrackActions: React.FC<TrackActionsProps> = ({ trackId, endpointUrl }) => {
+export const TrackActions: React.FC<TrackActionsProps> = ({ trackId, endpointUrl, id }) => {
   const link = `${endpointUrl}/track/${trackId}`;
 
   const handleCopy = async () => {
@@ -21,7 +22,7 @@ export const TrackActions: React.FC<TrackActionsProps> = ({ trackId, endpointUrl
   };
 
   const handleSend = async () => {
-    await api.post('api/send', {trackId});
+    await api.post('api/bulk/send', {ids: [id]});
   };
 
   return (

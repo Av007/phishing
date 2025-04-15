@@ -1,7 +1,7 @@
+import { Db, ObjectId, WithId } from 'mongodb';
 import { Inject, Injectable } from '@nestjs/common';
 import { SearchQueryDto } from './phishing';
 import { Phishing } from './phishing.schema';
-import { Db, WithId } from 'mongodb';
 
 @Injectable()
 export class PhishingService {
@@ -25,10 +25,16 @@ export class PhishingService {
       );
   }
 
+  async find(id: string): Promise<WithId<Phishing> | null> {
+    return this.db
+      .collection<Phishing>('Phishing')
+      .findOne({ _id: new ObjectId(id) });
+  }
+
   async findByTrackId(trackId: string): Promise<WithId<Phishing> | null> {
     return this.db
       .collection<Phishing>('Phishing')
-      .findOne({trackId});
+      .findOne({ trackId });
   }
 
   async findAll(

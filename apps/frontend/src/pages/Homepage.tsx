@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 import { useAuth } from '../provider/AuthProvider';
 import { api, apiSimulation } from '../helpers/api';
-import StatusChip, { PhishingStatus } from '../components/status';
+import StatusChip, { PhishingStatus } from '../components/Status';
 import { TrackActions } from '../components/TrackActions';
 import { getEnvsUrl } from '../helpers/envs';
 
@@ -55,8 +55,8 @@ const Homepage = () => {
         headerName: 'Link',
         sortable: false,
         filterable: false,
-        renderCell: (params: { value: string }) => (
-          <TrackActions trackId={params.value} endpointUrl={simulationUrl} />
+        renderCell: (params: { value: string, id:string }) => (
+          <TrackActions trackId={params.value} endpointUrl={simulationUrl} id={params.id} />
         ),
       },
       {
@@ -96,7 +96,7 @@ const Homepage = () => {
     fetchResults();
     const interval = setInterval(() => {
       fetchResults();
-    }, 10000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [fetchResults]);
   
@@ -108,6 +108,7 @@ const Homepage = () => {
       }
     }
   };
+  
 
   const CustomToolbar = () => {
     const [open, setOpen] = useState(false);
@@ -134,9 +135,9 @@ const Homepage = () => {
     };
 
     const confirmSend = async () => {
-      await api.post('api/bulk/send', {trackIds: selected});
-      fetchResults();
+      await api.post('api/bulk/send', {ids: selected});
       setOpenConfirm(false);
+      fetchResults();
     };
 
     const cancelSend = () => setOpenConfirm(false);

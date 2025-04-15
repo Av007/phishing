@@ -29,8 +29,11 @@ const Login: React.FC = () => {
       const token = data.access_token;
 
       localStorage.setItem('token', token);
-      localStorage.setItem('email', data.email);
       setToken(token);
+
+      const { data: user } = await api.get('/api/auth/me');
+      localStorage.setItem('email', user?.email);
+
       navigate('/', { replace: true });
     } catch (e) {
       if (e instanceof AxiosError) {
