@@ -5,20 +5,16 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm install --only=production
 
-# Stage 2: Build
 FROM docker.io/node:lts-alpine as builder
 WORKDIR /usr/src/app
 
-# Copy package files and install all dependencies, including devDependencies
 COPY . ./
 RUN npm install
 
 
-# Run the build command
 RUN npx nx run-many -t build
 
 
-# Stage 3: Production
 FROM docker.io/node:lts-alpine as production
 RUN apk add --no-cache dumb-init
 
@@ -29,22 +25,16 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 WORKDIR /app
 
-# Add system user for security
 RUN addgroup --system management && \
     adduser --system -G management management
 
-# Copy built files from the builder stage
 COPY --from=builder /usr/src/app/dist/apps/management ./management/
 
-# Set permissions for the `management` user
 RUN chown -R management:management ./management
 
-# Install production dependencies
 WORKDIR /app/management
 RUN npm install --omit=dev --production
 
-# Switch to the non-root user
 USER management
 
-# Start the app
 CMD [ "node", "." ]

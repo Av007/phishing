@@ -35,6 +35,7 @@ const Homepage = () => {
   const [data, setData] = useState<GridRowModel[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [open, setOpen] = useState(false);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
   const simulationUrl = getEnvsUrl('VITE_SIMULATION_URL');
@@ -95,10 +96,13 @@ const Homepage = () => {
   useEffect(() => {
     fetchResults();
     const interval = setInterval(() => {
+      if (open || openConfirm) {
+        return;
+      }
       fetchResults();
     }, 5000);
     return () => clearInterval(interval);
-  }, [fetchResults]);
+  }, [fetchResults, open, openConfirm]);
   
 
   const rowSelected = async (newRowSelectionModel: any) => {
@@ -108,10 +112,13 @@ const Homepage = () => {
       }
     }
   };
+
+  function update() {
+    fetchResults()
+  }
   
 
   const CustomToolbar = () => {
-    const [open, setOpen] = useState(false);
     const [emailInput, setEmailInput] = useState('');
 
     const handleOpen = () => setOpen(true);
@@ -123,7 +130,7 @@ const Homepage = () => {
     const handleAddEmails = async () => {
       await apiSimulation.post('phishing/send', { emails: emailInput });
 
-      fetchResults();
+      update();
       handleClose();
     };
 
@@ -137,7 +144,7 @@ const Homepage = () => {
     const confirmSend = async () => {
       await api.post('api/bulk/send', {ids: selected});
       setOpenConfirm(false);
-      fetchResults();
+      update();
     };
 
     const cancelSend = () => setOpenConfirm(false);

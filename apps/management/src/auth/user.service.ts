@@ -6,7 +6,7 @@ import { CreateUserDto, UpdateUserDto } from './types';
 
 @Injectable()
 export class UserService {
-  private collectionName = 'users';
+  private collectionName = 'Users';
 
   constructor(
     @Inject('DATABASE_CONNECTION') private db: Db,

@@ -27,10 +27,8 @@ async function bootstrap() {
     credentials: true,
   });
   await app.startAllMicroservices();
-  await app.listen(4000);
-  Logger.log(
-    `🚀 Application is running on: localhost:4000`
-  );
+  await app.listen(process.env.PORT || 3000, process.env.HOST || '0.0.0.0');
+  Logger.log(`🚀 Application is running on: http://localhost:4000`);
 }
 
 bootstrap();

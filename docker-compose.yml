@@ -11,8 +11,9 @@ services:
       - management
       - simulation
     environment:
-      - HOST=0.0.0.0
-      - PORT=3001
+      # - HOST=0.0.0.0
+      - VITE_SIMULATION_URL=http://localhost:4000
+      - VITE_MANAGEMENT_URL=http://localhost:3000
     networks:
       - app-network
 
@@ -28,12 +29,14 @@ services:
       - mongo
       - kafka
     environment:
-      - HOST=0.0.0.0
+      # - HOST=0.0.0.0
       - PORT=3000
+      - JWT_SECRET=fhdksjfbdhsjb34873298
+      - JWT_EXPIRES_IN=36000000
       - MONGO_URI=mongodb://mongo:27017/test
       - DATABASE_URL=mongodb://mongo:27017
       - DATABASE_NAME=test
-      - KAFKA_BROKER=kafka:9092
+      - KAFKA_BROKER=kafka:9093
     networks:
       - app-network
 
@@ -43,20 +46,20 @@ services:
       dockerfile: apps/simulation/Dockerfile
       target: production
     container_name: simulation
-    ports:
-      - "4000:3000"
+    hostname: simulation
     depends_on:
       - mongo
       - kafka
     environment:
       - HOST=0.0.0.0
       - PORT=3000
-      - MONGO_URI=mongodb://mongo:27017/test
       - DATABASE_URL=mongodb://mongo:27017
       - DATABASE_NAME=test
-      - KAFKA_BROKER=kafka:9092
+      - KAFKA_BROKER=kafka:9093
     networks:
       - app-network
+    ports:
+      - "4000:3000"
 
   mongo:
     image: mongo:latest
@@ -70,14 +73,15 @@ services:
 
   kafka:
     image: apache/kafka-native
-    hostname: broker
+    hostname: kafka
     container_name: kafka
+    depends_on:
+      - kafka-ui
     ports:
       - "9092:9092"
     networks:
       - app-network
     environment:
-      # Configure listeners for both docker and host communication
       KAFKA_LISTENERS: CONTROLLER://localhost:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
       KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
@@ -103,8 +107,6 @@ services:
       DYNAMIC_CONFIG_ENABLED: "true"
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
-    depends_on:
-      - kafka
     networks:
       - app-network
 

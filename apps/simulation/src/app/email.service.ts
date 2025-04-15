@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailerService {
   private transporter: nodemailer.Transporter;
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     nodemailer.createTestAccount().then((testAccount) => {
       this.transporter = nodemailer.createTransport({
         host: testAccount.smtp.host,
@@ -32,9 +33,9 @@ export class MailerService {
 
   async sendMail(email: string, trackId: string) {
     const info = await this.transporter.sendMail({
-      from: 'email@example.com',
+      from: this.configService.get<string>('EMAIL_FROM'),
       to: email,
-      subject: 'This is not phishing',
+      subject: this.configService.get<string>('EMAIL_SUBJECT'),
       html: `<h1>This is not phishing <a href="https://localhost/${trackId}"></a></h1>`,
     });
 

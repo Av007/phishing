@@ -26,10 +26,9 @@ import { AuthModule } from '../auth/auth.module';
             client: {
               clientId: configService.get<string>('KAFKA_CLIENT_ID'),
               brokers: [configService.get<string>('KAFKA_BROKER')],
-              requestTimeout: 30000,
             },
             consumer: {
-              groupId: configService.get<string>('KAFKA_SIMULATOR_GROUP_ID'),
+              groupId: configService.get<string>('KAFKA_GROUP_ID'),
             },
           },
         }),
