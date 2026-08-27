@@ -7,6 +7,10 @@ RUN npm install
 
 FROM base AS build
 WORKDIR /app
+ARG VITE_SIMULATION_URL=http://localhost:4000
+ARG VITE_MANAGEMENT_URL=http://localhost:3000
+ENV VITE_SIMULATION_URL=$VITE_SIMULATION_URL
+ENV VITE_MANAGEMENT_URL=$VITE_MANAGEMENT_URL
 COPY . .
 RUN npx nx run frontend:build --configuration=production
 

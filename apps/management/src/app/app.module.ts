@@ -3,9 +3,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatabaseModule } from '@libs/database';
 import { PhishingModule, PhishingService } from '@libs/phishing';
-import { LogModule } from '@libs/log';
+import { LogModule, LogService } from '@libs/log';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { MailerService } from './email.service';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
@@ -39,6 +40,6 @@ import { AuthModule } from '../auth/auth.module';
     PhishingModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PhishingService],
+  providers: [AppService, MailerService, PhishingService],
 })
 export class AppModule {}

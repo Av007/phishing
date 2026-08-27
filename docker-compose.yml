@@ -4,16 +4,15 @@ services:
       context: .
       dockerfile: apps/frontend/Dockerfile
       target: production
+      args:
+        - VITE_SIMULATION_URL=${VITE_SIMULATION_URL:-http://localhost:4000}
+        - VITE_MANAGEMENT_URL=${VITE_MANAGEMENT_URL:-http://localhost:3000}
     container_name: frontend
     ports:
       - "3001:3000"
     depends_on:
       - management
       - simulation
-    environment:
-      # - HOST=0.0.0.0
-      - VITE_SIMULATION_URL=http://localhost:4000
-      - VITE_MANAGEMENT_URL=http://localhost:3000
     networks:
       - app-network
 
