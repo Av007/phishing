@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { Phishing, PhishingCreateDto, PhishingService, SearchQueryDto } from '@libs/phishing';
+import { Phishing, PhishingCreateDto, PhishingService, PhishingStatus, SearchQueryDto } from '@libs/phishing';
 import { LogService } from '@libs/log';
 import { AppService } from './app.service';
 
