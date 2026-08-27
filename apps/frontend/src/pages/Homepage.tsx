@@ -128,7 +128,7 @@ const Homepage = () => {
     };
 
     const handleAddEmails = async () => {
-      await apiSimulation.post('phishing/send', { emails: emailInput });
+      await apiSimulation.post('api/phishing/send', { emails: emailInput });
 
       update();
       handleClose();

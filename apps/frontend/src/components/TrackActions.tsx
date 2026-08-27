@@ -11,7 +11,7 @@ interface TrackActionsProps {
 }
 
 export const TrackActions: React.FC<TrackActionsProps> = ({ trackId, endpointUrl, id }) => {
-  const link = `${endpointUrl}/track/${trackId}`;
+  const link = `${endpointUrl}/api/track/${trackId}`;
 
   const handleCopy = async () => {
     try {
