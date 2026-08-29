@@ -1,0 +1,43 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/frontend/**'
+      - 'libs/**'
+      - 'package.json'
+      - 'nx.json'
+      - 'tsconfig.base.json'
+      - 'eslint.config.cjs'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'apps/frontend/**'
+      - 'libs/**'
+      - 'package.json'
+      - 'nx.json'
+      - 'tsconfig.base.json'
+      - 'eslint.config.cjs'
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Lint
+        run: npx nx lint frontend
+
+      - name: Typecheck
+        run: npx nx typecheck frontend
+
+      - name: Build
+        run: npx nx build frontend
