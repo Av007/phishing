@@ -6,7 +6,6 @@ import SendIcon from '@mui/icons-material/Send';
 import {
   DataGrid,
   GridRowModel,
-  GridRowModesModel,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
 import {
@@ -36,7 +35,6 @@ const Homepage = () => {
   const [selected, setSelected] = useState<string[]>([]);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [open, setOpen] = useState(false);
-  const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
   const simulationUrl = getEnvsUrl('VITE_SIMULATION_URL');
 
@@ -65,7 +63,7 @@ const Homepage = () => {
         headerName: 'Created',
         width: 200,
         renderCell: (param: { value: string }) =>
-          formatDistance(param.value, Date.now(), {
+          formatDistance(new Date(param.value), Date.now(), {
             addSuffix: true,
           }),
       },
@@ -105,12 +103,8 @@ const Homepage = () => {
   }, [fetchResults, open, openConfirm]);
   
 
-  const rowSelected = async (newRowSelectionModel: any) => {
-    for (const item of newRowSelectionModel) {
-      if (!selected.includes(item)) {
-        setSelected(newRowSelectionModel);
-      }
-    }
+  const rowSelected = (newRowSelectionModel: any) => {
+    setSelected(newRowSelectionModel);
   };
 
   function update() {
@@ -257,7 +251,6 @@ const Homepage = () => {
           filterMode="server"
           slots={{ toolbar: CustomToolbar }}
           onRowSelectionModelChange={rowSelected}
-          onRowModesModelChange={setRowModesModel}
           disableColumnFilter
           disableColumnSelector
           disableDensitySelector

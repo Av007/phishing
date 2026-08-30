@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { IconButton, Stack, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SendIcon from '@mui/icons-material/Send';
@@ -10,7 +10,7 @@ interface TrackActionsProps {
   endpointUrl: string;
 }
 
-export const TrackActions: React.FC<TrackActionsProps> = ({ trackId, endpointUrl, id }) => {
+export const TrackActions: FC<TrackActionsProps> = ({ trackId, endpointUrl, id }) => {
   const link = `${endpointUrl}/api/track/${trackId}`;
 
   const handleCopy = async () => {

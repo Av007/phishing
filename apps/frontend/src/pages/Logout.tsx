@@ -8,7 +8,8 @@ const Logout = () => {
 
   useEffect(() => {
     setToken(null);
-    localStorage.removeItem("query");
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
     navigate("/", { replace: true });
   }, [navigate, setToken]);
 

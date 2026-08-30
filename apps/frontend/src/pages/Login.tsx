@@ -1,4 +1,4 @@
-import { useState, FormEvent, ChangeEvent } from 'react';
+import { useState, FormEvent, ChangeEvent, FC } from 'react';
 import { AxiosError } from 'axios';
 import {
   TextField,
@@ -12,7 +12,7 @@ import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../provider/AuthProvider';
 import { api } from '../helpers/api';
 
-const Login: React.FC = () => {
+const Login: FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);

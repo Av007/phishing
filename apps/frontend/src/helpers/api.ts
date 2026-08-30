@@ -27,3 +27,16 @@ export const apiSimulation: AxiosInstance = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+apiSimulation.interceptors.request.use(
+  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+    const token = localStorage.getItem("token");
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error: AxiosError): Promise<AxiosError> => {
+    return Promise.reject(error);
+  }
+);

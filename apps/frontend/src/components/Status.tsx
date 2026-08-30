@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Chip } from '@mui/material';
 
 export enum PhishingStatus {
@@ -19,7 +19,7 @@ const statusColors: Record<PhishingStatus, 'default' | 'primary' | 'success' | '
   [PhishingStatus.FAILED]: 'error',
 };
 
-const StatusChip: React.FC<StatusChipProps> = ({ status }) => {
+const StatusChip: FC<StatusChipProps> = ({ status }) => {
   const chipColor = statusColors[status] || 'default';
 
   return (

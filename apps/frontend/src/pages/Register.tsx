@@ -1,4 +1,4 @@
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useState, FormEvent, ChangeEvent, FC } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   TextField,
@@ -11,7 +11,7 @@ import {
 import { useAuth } from "../provider/AuthProvider";
 import {api} from "../helpers/api";
 
-const Register: React.FC = () => {
+const Register: FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -33,7 +33,7 @@ const Register: React.FC = () => {
         password,
       });
       
-      const token = data.access;
+      const token = data.access_token;
       localStorage.setItem("token", token);
       localStorage.setItem("email", data.email);
       setToken(token);

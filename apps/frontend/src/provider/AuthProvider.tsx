@@ -1,4 +1,5 @@
-import React, {
+import {
+  FC,
   createContext,
   useContext,
   useEffect,
@@ -19,7 +20,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken_] = useState<string | null>(localStorage.getItem("token"));
 
   const setToken = (newToken: string | null) => {
@@ -38,7 +39,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const intervalId = setInterval(async () => {
       try {
         const {data} = await api.get('/api/auth/me');
-        localStorage.set('email', data?.email);
+        localStorage.setItem('email', data?.email);
       } catch (error: any) {
         if (error.response?.status === 401) {
           setToken(null);
