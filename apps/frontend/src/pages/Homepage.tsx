@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, ChangeEvent } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import _ from 'lodash';
 import AddIcon from '@mui/icons-material/Add';
 import SendIcon from '@mui/icons-material/Send';
@@ -233,13 +234,14 @@ const Homepage = () => {
               />
             )}
             <Link
+              component={RouterLink}
+              to="/logout"
               sx={{
                 color: 'white',
                 textDecoration: 'none',
                 fontWeight: 'bold',
                 ':hover': { color: 'lightgray' },
               }}
-              href="/logout"
             >
               Logout
             </Link>
