@@ -1,5 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
-import { formatDistance } from 'date-fns';
+import { useState, useCallback, useEffect, useMemo, ChangeEvent } from 'react';
 import _ from 'lodash';
 import AddIcon from '@mui/icons-material/Add';
 import SendIcon from '@mui/icons-material/Send';
@@ -65,10 +64,17 @@ const Homepage = () => {
         field: 'createdAt',
         headerName: 'Created',
         width: 200,
-        renderCell: (params: GridRenderCellParams) =>
-          formatDistance(new Date(params.value as string), Date.now(), {
-            addSuffix: true,
-          }),
+        renderCell: (params: GridRenderCellParams) => {
+          const past = Temporal.Instant.from(params.value as string);
+          const now = Temporal.Now.instant();
+          const duration = past.until(now);
+          const totalSeconds = duration.total({ unit: 'seconds' });
+          const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+          if (totalSeconds >= 86400) return rtf.format(-Math.round(totalSeconds / 86400), 'day');
+          if (totalSeconds >= 3600) return rtf.format(-Math.round(totalSeconds / 3600), 'hour');
+          if (totalSeconds >= 60) return rtf.format(-Math.round(totalSeconds / 60), 'minute');
+          return rtf.format(-Math.round(totalSeconds), 'second');
+        },
       },
     ],
     [simulationUrl],
@@ -190,7 +196,7 @@ const Homepage = () => {
                 rows={3}
                 fullWidth
                 value={emailInput}
-                onChange={(e) => setEmailInput(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setEmailInput(e.target.value)}
               />
             </Stack>
           </DialogContent>
