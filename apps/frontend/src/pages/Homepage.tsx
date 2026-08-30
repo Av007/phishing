@@ -5,6 +5,8 @@ import AddIcon from '@mui/icons-material/Add';
 import SendIcon from '@mui/icons-material/Send';
 import {
   DataGrid,
+  GridColDef,
+  GridRenderCellParams,
   GridRowModel,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
@@ -38,15 +40,16 @@ const Homepage = () => {
 
   const simulationUrl = getEnvsUrl('VITE_SIMULATION_URL');
 
-  const columns = useMemo(
+  const columns: GridColDef[] = useMemo(
     () => [
       { field: '_id', headerName: 'ID' },
       { field: 'email', headerName: 'email', width: 200 },
       {
         field: 'status',
         headerName: 'Status',
-        renderCell: (params: { value: PhishingStatus }) => (
-          <StatusChip status={params.value} />
+        type: 'string',
+        renderCell: (params: GridRenderCellParams) => (
+          <StatusChip status={params.value as PhishingStatus} />
         ),
       },
       {
@@ -54,16 +57,16 @@ const Homepage = () => {
         headerName: 'Link',
         sortable: false,
         filterable: false,
-        renderCell: (params: { value: string, id:string }) => (
-          <TrackActions trackId={params.value} endpointUrl={simulationUrl} id={params.id} />
+        renderCell: (params: GridRenderCellParams) => (
+          <TrackActions trackId={params.value as string} endpointUrl={simulationUrl} id={params.row._id as string} />
         ),
       },
       {
         field: 'createdAt',
         headerName: 'Created',
         width: 200,
-        renderCell: (param: { value: string }) =>
-          formatDistance(new Date(param.value), Date.now(), {
+        renderCell: (params: GridRenderCellParams) =>
+          formatDistance(new Date(params.value as string), Date.now(), {
             addSuffix: true,
           }),
       },
