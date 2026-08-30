@@ -1,42 +1,37 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError } from "axios";
 import { getEnvsUrl } from "./envs";
 
-export const api: AxiosInstance = axios.create({
-  baseURL: getEnvsUrl(),
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+function createApi(baseURL: string) {
+  const request = async (method: string, url: string, body?: unknown) => {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
     const token = localStorage.getItem("token");
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
     }
-    return config;
-  },
-  (error: AxiosError): Promise<AxiosError> => {
-    return Promise.reject(error);
-  }
-);
 
-export const apiSimulation: AxiosInstance = axios.create({
-  baseURL: getEnvsUrl('VITE_SIMULATION_URL'),
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+    const res = await fetch(`${baseURL}/${url}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
 
-apiSimulation.interceptors.request.use(
-  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const token = localStorage.getItem("token");
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const error = new Error(data?.message || res.statusText);
+      (error as any).response = { status: res.status, data };
+      throw error;
     }
-    return config;
-  },
-  (error: AxiosError): Promise<AxiosError> => {
-    return Promise.reject(error);
-  }
-);
+
+    return { data };
+  };
+
+  return {
+    get: (url: string) => request("GET", url),
+    post: (url: string, body?: unknown) => request("POST", url, body),
+  };
+}
+
+export const api = createApi(getEnvsUrl());
+export const apiSimulation = createApi(getEnvsUrl('VITE_SIMULATION_URL'));

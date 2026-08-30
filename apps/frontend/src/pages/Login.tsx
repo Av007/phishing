@@ -1,5 +1,4 @@
 import { useState, FormEvent, ChangeEvent, FC } from 'react';
-import { AxiosError } from 'axios';
 import {
   TextField,
   Button,
@@ -35,13 +34,8 @@ const Login: FC = () => {
       localStorage.setItem('email', user?.email);
 
       navigate('/', { replace: true });
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        setError(e.response?.data && e.response?.data?.message);
-      } else {
-        const error = e as Error;
-        setError(error.message);
-      }
+    } catch (e: any) {
+      setError(e.response?.data?.message || e.message);
     }
   };
 
