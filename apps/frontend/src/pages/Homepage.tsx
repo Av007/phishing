@@ -83,7 +83,7 @@ const Homepage = () => {
   const fetchResults = useCallback(
     _.debounce(() => {
       api
-        .get('api/phishing', { params: {} })
+        .get('api/phishing')
         .then((response) => {
           const { data } = response;
           setData(
